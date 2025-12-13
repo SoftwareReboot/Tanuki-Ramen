@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tanuki Ramen - Login</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0505 50%, #0a0a0a 100%);
+            background-attachment: fixed;
+            color: #e0e0e0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Animated background particles */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(139, 0, 0, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(196, 30, 30, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(255, 0, 0, 0.1) 0%, transparent 40%);
+            animation: pulse 8s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 0.8; }
+        }
+
+        /* Floating ramen bowls in background */
+        .floating-emoji {
+            position: fixed;
+            font-size: 40px;
+            opacity: 0.1;
+            animation: float 15s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .emoji-1 { top: 10%; left: 10%; animation-delay: 0s; }
+        .emoji-2 { top: 70%; left: 80%; animation-delay: 3s; }
+        .emoji-3 { top: 30%; left: 70%; animation-delay: 6s; }
+        .emoji-4 { top: 80%; left: 20%; animation-delay: 9s; }
+        .emoji-5 { top: 50%; left: 50%; animation-delay: 12s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            25% { transform: translateY(-20px) rotate(5deg); }
+            50% { transform: translateY(-40px) rotate(-5deg); }
+            75% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        .login-container {
+            position: relative;
+            z-index: 1;
+            width: 450px;
+            background: rgba(20, 20, 20, 0.95);
+            padding: 50px 40px;
+            border-radius: 25px;
+            box-shadow: 
+                0 20px 80px rgba(139, 0, 0, 0.6),
+                0 0 100px rgba(255, 0, 0, 0.3),
+                inset 0 1px 1px rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(139, 0, 0, 0.4);
+            animation: slideInDown 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-100px) scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .logout-btn {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: linear-gradient(135deg, #666, #888);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85em;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .logout-btn:hover {
+            background: linear-gradient(135deg, #888, #aaa);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .user-info {
+            background: rgba(139, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(139, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        .user-info p {
+            margin: 5px 0;
+            color: #ff6b6b;
+        }
+
+        .user-info strong {
+            color: #ff0000;
+        }
+
+        .logo-image {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            border: 4px solid rgba(255, 0, 0, 0.5);
+            padding: 10px;
+            background: rgba(139, 0, 0, 0.2);
+            box-shadow: 
+                0 0 30px rgba(255, 0, 0, 0.6),
+                inset 0 0 20px rgba(255, 0, 0, 0.2);
+            animation: glow-pulse 3s ease-in-out infinite;
+            transition: transform 0.3s ease;
+        }
+
+        .logo-image:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        @keyframes glow-pulse {
+            0%, 100% { 
+                box-shadow: 
+                    0 0 30px rgba(255, 0, 0, 0.6),
+                    inset 0 0 20px rgba(255, 0, 0, 0.2);
+            }
+            50% { 
+                box-shadow: 
+                    0 0 60px rgba(255, 0, 0, 0.9),
+                    inset 0 0 40px rgba(255, 0, 0, 0.4);
+            }
+        }
+
+        .logo-text {
+            font-size: 2.5em;
+            font-weight: bold;
+            background: linear-gradient(45deg, #ff0000, #ff6b6b, #ff0000);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 10px;
+            animation: shimmer 3s ease-in-out infinite;
+            background-size: 200% auto;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 0% center; }
+            50% { background-position: 100% center; }
+            100% { background-position: 0% center; }
+        }
+
+        .logo-subtitle {
+            color: #999;
+            font-size: 0.9em;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .tab-container {
+            display: flex;
+            margin-bottom: 30px;
+            border-bottom: 2px solid rgba(139, 0, 0, 0.3);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            color: #888;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .tab:hover {
+            color: #ff6b6b;
+        }
+
+        .tab.active {
+            color: #ff0000;
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, #ff0000, #ff6b6b, #ff0000);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .form-content {
+            display: none;
+        }
+
+        .form-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            color: #ff6b6b;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2em;
+            color: #ff6b6b;
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px 15px 15px 45px;
+            border: 2px solid rgba(139, 0, 0, 0.3);
+            border-radius: 10px;
+            background: rgba(10, 10, 10, 0.8);
+            color: #e0e0e0;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #ff0000;
+            box-shadow: 0 0 25px rgba(255, 0, 0, 0.4);
+            background: rgba(10, 10, 10, 1);
+        }
+
+        input:focus + .input-icon {
+            color: #ff0000;
+            transform: translateY(-50%) scale(1.2);
+        }
+
+        input::placeholder {
+            color: #555;
+        }
+
+        .remember-forgot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            font-size: 0.9em;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            color: #999;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .remember-me:hover {
+            color: #ff6b6b;
+        }
+
+        .remember-me input[type="checkbox"] {
+            width: auto;
+            margin-right: 8px;
+            cursor: pointer;
+        }
+
+        .forgot-password {
+            color: #ff6b6b;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .forgot-password:hover {
+            color: #ff0000;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+        }
+
+        button {
+            width: 100%;
+            padding: 18px;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(135deg, #8B0000, #ff0000, #8B0000);
+            background-size: 200% auto;
+            color: white;
+            font-size: 1.1em;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            box-shadow: 0 8px 30px rgba(139, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        button:hover::before {
+            left: 100%;
+        }
+
+        button:hover {
+            background-position: right center;
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(255, 0, 0, 0.7);
+        }
+
+        button:active {
+            transform: translateY(-1px);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 20px 30px;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            animation: slideInRight 0.5s ease-out;
+            max-width: 350px;
+        }
+
+        .notification.success {
+            background: linear-gradient(135deg, rgba(0, 139, 0, 0.95), rgba(34, 139, 34, 0.95));
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, rgba(196, 30, 30, 0.95), rgba(139, 0, 0, 0.95));
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .divider {
+            text-align: center;
+            margin: 30px 0;
+            position: relative;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 40%;
+            height: 1px;
+            background: linear-gradient(to right, transparent, rgba(139, 0, 0, 0.5));
+        }
+
+        .divider::before {
+            left: 0;
+        }
+
+        .divider::after {
+            right: 0;
+            background: linear-gradient(to left, transparent, rgba(139, 0, 0, 0.5));
+        }
+
+        .divider-text {
+            color: #666;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Loading spinner */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating background emojis -->
+    <div class="floating-emoji emoji-1">🍜</div>
+    <div class="floating-emoji emoji-2">🥢</div>
+    <div class="floating-emoji emoji-3">🍜</div>
+    <div class="floating-emoji emoji-4">🥟</div>
+    <div class="floating-emoji emoji-5">🍜</div>
+
+    <div class="login-container">
+        <div class="logo-section">
+        <button class="logout-btn" id="logout-btn" style="display: none;" onclick="handleLogout()">🚪 Logout</button>
+    
+        <img src="spiningLogo.png" alt="Your New Logo" class="logo-image">
+
+        <div class="logo-text">Tanuki Ramen</div>
+        <div class="logo-subtitle">Management Portal</div>
+        </div>
+
+        <div id="user-info-section" style="display: none;">
+            <div class="user-info">
+                <p><strong>Currently logged in as:</strong></p>
+                <p id="current-user-display"></p>
+                <p style="color: #999; font-size: 0.9em; margin-top: 10px;">Want to switch accounts? Logout first.</p>
+            </div>
+        </div>
+
+        <div class="tab-container">
+            <div class="tab active" onclick="switchTab('login')">Login</div>
+            <div class="tab" onclick="switchTab('register')">Register</div>
+        </div>
+
+        <!-- Login Form -->
+        <div id="login-form" class="form-content active">
+            <form onsubmit="handleLogin(event)">
+                <div class="input-group">
+                    <label for="login-username">Username</label>
+                    <div class="input-wrapper">
+                        <input 
+                            type="text" 
+                            id="login-username" 
+                            placeholder="Enter your username"
+                            required
+                        >
+                        <span class="input-icon">👤</span>
+                    </div>
+                </div>
+
+                <button type="submit" id="login-btn">
+                    🍜 Sign In
+                </button>
+            </form>
+        </div>
+
+        <!-- Register Form -->
+        <div id="register-form" class="form-content">
+            <form onsubmit="handleRegister(event)">
+                <div class="input-group">
+                    <label for="reg-username">Username</label>
+                    <div class="input-wrapper">
+                        <input 
+                            type="text" 
+                            id="reg-username" 
+                            placeholder="Choose a username"
+                            required
+                        >
+                        <span class="input-icon">👤</span>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="reg-name">Full Name</label>
+                    <div class="input-wrapper">
+                        <input 
+                            type="text" 
+                            id="reg-name" 
+                            placeholder="Enter your full name"
+                            required
+                        >
+                        <span class="input-icon">📝</span>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="reg-role">Role</label>
+                    <div class="input-wrapper">
+                        <select 
+                            id="reg-role" 
+                            style="padding-left: 45px;"
+                            required
+                        >
+                            <option value="">Select Role</option>
+                            <option value="MANAGER">👨‍💼 Manager</option>
+                            <option value="CASHIER">💰 Cashier</option>
+                            <option value="WAITER">🍽️ Waiter</option>
+                            <option value="CHEF">👨‍🍳 Chef</option>
+                        </select>
+                        <span class="input-icon">👔</span>
+                    </div>
+                </div>
+
+                <button type="submit" id="register-btn">
+                    ✨ Create Account
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const BASE_URL = "http://localhost:8080/users";
+
+        function switchTab(tab) {
+            // Update tab styling
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Show/hide forms
+            document.querySelectorAll('.form-content').forEach(f => f.classList.remove('active'));
+            document.getElementById(`${tab}-form`).classList.add('active');
+        }
+
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.animation = 'slideInRight 0.5s ease-out reverse';
+                setTimeout(() => notification.remove(), 500);
+            }, 3000);
+        }
+
+        async function handleLogin(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('login-username').value;
+            const button = document.getElementById('login-btn');
+            
+            button.disabled = true;
+            button.innerHTML = '<span class="spinner"></span>Signing in...';
+
+            try {
+                console.log('Attempting to fetch user:', `${BASE_URL}/username/${username}`);
+                
+                // Get user by username
+                const response = await fetch(`${BASE_URL}/username/${username}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                console.log('Response status:', response.status);
+                
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        throw new Error('User not found. Please check your username.');
+                    }
+                    throw new Error(`Server error: ${response.status}`);
+                }
+
+                const user = await response.json();
+                console.log('User fetched:', user);
+
+                // No password check - just login with username
+                const userRole = user.role?.roleName || user.roleName || 'UNKNOWN';
+                
+                localStorage.setItem('currentUser', JSON.stringify({
+                    userId: user.userId,
+                    username: user.username,
+                    role: userRole,
+                    name: user.name
+                }));
+
+                showNotification('✅ Login successful! Redirecting...', 'success');
+                
+                setTimeout(() => {
+                    // Redirect based on role
+                    if (userRole === 'MANAGER') {
+                        window.location.href = 'index.html';
+                    } else if (userRole === 'CASHIER') {
+                        window.location.href = 'payment.html';
+                    } else if (userRole === 'WAITER') {
+                        window.location.href = 'waiter-dashboard.html';
+                    } else if (userRole === 'CHEF') {
+                        window.location.href = 'chef.html';
+                    } else {
+                        showNotification('❌ Unknown role: ' + userRole, 'error');
+                    }
+                }, 1500);
+
+            } catch (error) {
+                console.error('Login error:', error);
+                
+                // Better error messages
+                if (error.message === 'Failed to fetch') {
+                    showNotification('❌ Cannot connect to server. Make sure backend is running on http://localhost:8080', 'error');
+                } else {
+                    showNotification('❌ ' + error.message, 'error');
+                }
+            } finally {
+                button.disabled = false;
+                button.innerHTML = '🍜 Sign In';
+            }
+        }
+
+        async function handleRegister(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('reg-username').value;
+            const name = document.getElementById('reg-name').value;
+            const role = document.getElementById('reg-role').value;
+            const button = document.getElementById('register-btn');
+            
+            button.disabled = true;
+            button.innerHTML = '<span class="spinner"></span>Creating account...';
+
+            try {
+                console.log('Registering user with role:', role);
+                
+                const response = await fetch(BASE_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        name: name,
+                        roleName: role
+                    })
+                });
+                
+                console.log('Registration response status:', response.status);
+
+                if (!response.ok) {
+                    const error = await response.text();
+                    throw new Error(error || 'Registration failed');
+                }
+
+                const user = await response.json();
+                
+                showNotification('✅ Account created successfully! Please login.', 'success');
+                
+                // Switch to login tab after 1.5 seconds
+                setTimeout(() => {
+                    document.querySelector('.tab:first-child').click();
+                    document.getElementById('login-username').value = username;
+                }, 1500);
+
+            } catch (error) {
+                console.error('Registration error:', error);
+                console.error('Error details:', error.message);
+                
+                if (error.message === 'Failed to fetch') {
+                    showNotification('❌ Cannot connect to server. Make sure backend is running on http://localhost:8080', 'error');
+                } else {
+                    showNotification('❌ ' + error.message, 'error');
+                }
+            } finally {
+                button.disabled = false;
+                button.innerHTML = '✨ Create Account';
+            }
+        }
+
+        // Check if user is already logged in
+        window.onload = function() {
+            const currentUser = localStorage.getItem('currentUser');
+            if (currentUser) {
+                const user = JSON.parse(currentUser);
+                showNotification(`Welcome back, ${user.username}!`, 'success');
+                
+                setTimeout(() => {
+                    if (user.role === 'MANAGER') {
+                        window.location.href = 'index.html';
+                    } else if (user.role === 'CASHIER') {
+                        window.location.href = 'payment.html';
+                    } else if (user.role === 'WAITER') {
+                        window.location.href = 'waiter-dashboard.html';
+                    } else if (user.role === 'CHEF') {
+                        window.location.href = 'chef.html';
+                    }
+                }, 1500);
+            }
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tanuki Payment Manager</title>
+    <style>
+        /*
+        * CSS from your index.html guide - ensuring visual consistency
+        */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0505 50%, #0a0a0a 100%);
+            background-attachment: fixed;
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(139, 0, 0, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(196, 30, 30, 0.1) 0%, transparent 50%);
+            animation: pulse 8s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* HEADER STYLES */
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        #logo-header {
+            display: flex;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 3.5em;
+            background: linear-gradient(45deg, #ff0000, #8B0000, #ff4444);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(255, 0, 0, 0.5);
+            margin-bottom: 0;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+        
+        /* USER PANEL & LOGOUT BUTTON STYLES */
+        .user-info-panel {
+            background: rgba(42, 42, 42, 0.8);
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px solid rgba(139, 0, 0, 0.3);
+            box-shadow: 0 5px 25px rgba(139, 0, 0, 0.4);
+            min-width: 250px;
+            text-align: center;
+        }
+
+        .user-info-panel h3 {
+            color: #ff4444;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .user-info-panel p {
+            color: #b0b0b0;
+            margin: 5px 0;
+        }
+
+        .user-info-panel strong {
+            color: #ff6b6b;
+        }
+
+        .logout-btn {
+            background: linear-gradient(135deg, #c41e1e, #ff4444);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(139, 0, 0, 0.4);
+            width: 100%;
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(255, 0, 0, 0.6);
+        }
+        
+        /* CONTENT STYLES (for example content) */
+        .payment-stats {
+            background: rgba(42, 42, 42, 0.8);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(139, 0, 0, 0.4);
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .stat-card {
+            padding: 20px;
+            border-radius: 10px;
+            background: rgba(60, 20, 20, 0.9);
+            border-left: 5px solid #ff4444;
+        }
+
+        .stat-card h4 {
+            color: #ff6b6b;
+            margin-bottom: 5px;
+        }
+
+        .stat-card p {
+            font-size: 2em;
+            font-weight: bold;
+            color: #e0e0e0;
+        }
+
+        h2 {
+            color: #c41e1e;
+            margin: 30px 0 20px 0;
+            font-size: 1.8em;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+        
+        /* NOTIFICATION STYLES (for JavaScript success pop-ups) */
+        @keyframes successPop {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes fadeOut {
+            to { opacity: 0; }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header-container">
+            <div id="logo-header">
+                <div style="font-size: 120px;">💰</div>
+                <h1>Tanuki Payment Manager</h1>
+            </div>
+            
+            <div class="user-info-panel">
+                <h3>👤 Current User</h3>
+                <p><strong>Name:</strong> <span id="user-name">Manager</span></p>
+                <p><strong>Role:</strong> <span id="user-role">ADMIN</span></p>
+                
+                <button class="logout-btn" onclick="handleLogout()">🚪 Logout</button>
+            </div>
+        </div>
+        
+        <hr>
+
+        <h2>📊 Financial Overview</h2>
+        <div class="payment-stats">
+            <div class="stat-card">
+                <h4>Total Revenue (Today)</h4>
+                <p>$1,250.00</p>
+            </div>
+            <div class="stat-card">
+                <h4>Successful Payments</h4>
+                <p>98%</p>
+            </div>
+            <div class="stat-card">
+                <h4>Pending Payments</h4>
+                <p>5</p>
+            </div>
+        </div>
+
+        <h2>🧾 Recent Transactions</h2>
+        
+
+    </div>
+
+    <script>
+        // --- CONSISTENT JAVASCRIPT LOGIC ---
+        
+        // This function handles the centralized, consistent logout logic.
+        function handleLogout() {
+            if (confirm('Are you sure you want to log out of the Payment Manager?')) {
+                // 1. Clear session/auth indicator (even if currentUser isn't fully defined here, it's consistent)
+                localStorage.removeItem('currentUser');
+                
+                // 2. Show the success notification using the consistent style
+                showNotification('👋 Logged out successfully!');
+                
+                // 3. Redirect to the login page (your existing LoginPage.html)
+                setTimeout(() => {
+                    window.location.href = 'LoginPage.html';
+                }, 1000);
+            }
+        }
+
+        // The notification function (copied for consistency)
+        function showNotification(message, isError = false) {
+            const notification = document.createElement("div");
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 20px 30px;
+                background: ${isError ? 'rgba(196, 30, 30, 0.95)' : 'rgba(139, 0, 0, 0.95)'};
+                color: white;
+                border-radius: 10px;
+                box-shadow: 0 5px 30px rgba(0, 0, 0, 0.5);
+                z-index: 1000;
+                animation: successPop 0.5s ease-out;
+                font-weight: bold;
+            `;
+            document.body.appendChild(notification);
+            setTimeout(() => {
+                notification.style.animation = 'fadeOut 0.5s ease-out';
+                setTimeout(() => notification.remove(), 500);
+            }, 3000);
+        }
+
+        // Initialize user info on load (can be simplified if no real auth check is needed here)
+        window.onload = function() {
+            const currentUser = localStorage.getItem('currentUser');
+            if (currentUser) {
+                try {
+                    const user = JSON.parse(currentUser);
+                    document.getElementById('user-name').textContent = user.name || user.username;
+                    document.getElementById('user-role').textContent = user.role;
+                } catch (e) {
+                    console.error("Error parsing user data:", e);
+                }
+            }
+        };
+    </script>
+</body>
+</html>
