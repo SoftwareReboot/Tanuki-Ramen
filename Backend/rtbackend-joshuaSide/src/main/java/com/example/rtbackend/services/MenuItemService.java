@@ -15,6 +15,8 @@ public interface MenuItemService {
 
     MenuItem updateMenuItem(Long requesterId, Long itemId, MenuItem menuItem);
 
+    MenuItem updateMenuItemWithImage(Long requesterId, Long itemId, MenuItem menuItem, String imagePath);
+
     MenuItem updateStock(Long requesterId, Long itemId, int newStock);
     
     void deleteMenuItem(Long requesterId, Long itemId);

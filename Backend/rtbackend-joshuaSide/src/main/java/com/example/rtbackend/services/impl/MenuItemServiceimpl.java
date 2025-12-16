@@ -68,6 +68,25 @@ public class MenuItemServiceimpl implements MenuItemService {
     }
 
     @Override
+    public MenuItem updateMenuItemWithImage(Long requesterId, Long itemId, MenuItem newItem, String imagePath) {
+        validateManager(requesterId);
+        MenuItem item = getMenuItemById(itemId);
+
+        item.setName(newItem.getName());
+        item.setPrice(newItem.getPrice());
+        item.setCategory(newItem.getCategory());
+        item.setDescription(newItem.getDescription());
+        item.setStockQuantity(newItem.getStockQuantity());
+        
+        // Only update image path if a new image was uploaded
+        if (imagePath != null && !imagePath.isEmpty()) {
+            item.setImagePath(imagePath);
+        }
+
+        return menuItemRepo.save(item);
+    }
+
+    @Override
     public void deleteMenuItem(Long requesterId, Long itemId) {
         validateManager(requesterId);
         menuItemRepo.deleteById(itemId);

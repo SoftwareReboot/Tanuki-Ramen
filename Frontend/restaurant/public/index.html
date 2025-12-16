@@ -618,7 +618,6 @@
         }
 
         function editItem(itemId) {
-            // NOTE: The itemId passed here is already the clean number from the loadMenu loop.
             fetch(`${BASE_URL}/${itemId}`)
                 .then(res => res.json())
                 .then(item => {
@@ -632,8 +631,6 @@
                     document.getElementById("submit-btn").textContent = "💾 Update Item";
                     document.getElementById("cancel-btn").style.display = "inline-block";
                     
-                    // The original issue was likely here: if the item ID was somehow corrupted 
-                    // before this point, it would persist. We ensure it's clean for the update logic.
                     editingItemId = parseInt(itemId); 
                     
                     document.getElementById("menu-form").scrollIntoView({ behavior: 'smooth' });
@@ -653,7 +650,6 @@
         }
 
         async function deleteItem(itemId) {
-            // FIX: Ensure itemId is a clean number before using it in the URL
             const cleanItemId = parseInt(itemId);
 
             if (!cleanItemId || isNaN(cleanItemId)) {
@@ -668,7 +664,6 @@
             
             try {
                 console.log("Deleting item ID:", cleanItemId);
-                // Use the cleanItemId in the request URL
                 const res = await fetch(`${BASE_URL}/delete/${requesterId}/${cleanItemId}`, { 
                     method: "DELETE" 
                 });
@@ -737,24 +732,45 @@
                 };
 
                 if (editingItemId) {
-                    // FIX: Ensure the ID used in the PUT request is a clean integer
                     const cleanEditingItemId = parseInt(editingItemId);
                     if (isNaN(cleanEditingItemId)) {
                         throw new Error("Update failed: Invalid Item ID in form state.");
                     }
                     
-                    const res = await fetch(`${BASE_URL}/update/${requesterId}/${cleanEditingItemId}`, {
-                        method: "PUT",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(menuItemData)
-                    });
-                    
-                    if (!res.ok) {
-                        const errorText = await res.text();
-                        throw new Error(`HTTP error! status: ${res.status}, message: ${errorText}`);
+                    // Check if user is uploading a new image
+                    if (file) {
+                        // Update with new image
+                        const formData = new FormData();
+                        formData.append("file", file);
+                        formData.append("menuItem", JSON.stringify(menuItemData));
+
+                        const res = await fetch(`${BASE_URL}/update/with-image/${requesterId}/${cleanEditingItemId}`, {
+                            method: "PUT",
+                            body: formData
+                        });
+                        
+                        if (!res.ok) {
+                            const errorText = await res.text();
+                            throw new Error(`HTTP error! status: ${res.status}, message: ${errorText}`);
+                        }
+                        
+                        console.log("Item updated with new image");
+                    } else {
+                        // Update without changing image
+                        const res = await fetch(`${BASE_URL}/update/${requesterId}/${cleanEditingItemId}`, {
+                            method: "PUT",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify(menuItemData)
+                        });
+                        
+                        if (!res.ok) {
+                            const errorText = await res.text();
+                            throw new Error(`HTTP error! status: ${res.status}, message: ${errorText}`);
+                        }
+                        
+                        console.log("Item updated without changing image");
                     }
                     
-                    console.log("Item updated successfully");
                     showNotification("✅ Item updated successfully!");
                     cancelEdit();
                 } else {

@@ -25,7 +25,7 @@ import tools.jackson.databind.ObjectMapper;
 
 @RestController
 @RequestMapping("/menu")
-@CrossOrigin(origins = "*") // e add nya ni sa tanan controllers
+@CrossOrigin(origins = "*")
 public class MenuItemController {
 
     private final MenuItemService menuItemService;
@@ -102,6 +102,39 @@ public class MenuItemController {
             return ResponseEntity.notFound().build();
         } catch (SecurityException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        }
+    }
+
+    @PutMapping(
+        value = "/update/with-image/{requesterId}/{itemId}",
+        consumes = "multipart/form-data",
+        produces = "application/json"
+    )
+    public ResponseEntity<?> updateItemWithImage(
+        @PathVariable Long requesterId,
+        @PathVariable Long itemId,
+        @RequestParam(value = "file", required = false) MultipartFile file,
+        @RequestParam("menuItem") String menuItemJson
+    ) {
+        try {
+            MenuItem menuItem = new ObjectMapper().readValue(menuItemJson, MenuItem.class);
+            
+            // If a new file is provided, upload it
+            String fileName = null;
+            if (file != null && !file.isEmpty()) {
+                fileName = fileStorageService.storeFile(file);
+            }
+            
+            MenuItem updatedItem = menuItemService.updateMenuItemWithImage(requesterId, itemId, menuItem, fileName);
+            return ResponseEntity.ok(updatedItem);
+
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.notFound().build();
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Could not update menu item: " + e.getMessage());
         }
     }
 
