@@ -490,7 +490,12 @@
                 <textarea id="description" rows="3" placeholder="e.g., Rich pork broth, marinated egg, and nori"></textarea>
 
                 <label for="image">Image (optional)</label>
-                <input id="image" type="file" accept="image/*">
+                <input id="image" type="file" accept="image/*" capture="environment">
+                
+                <div id="image-preview-container" style="display: none; margin-bottom: 20px;">
+                    <img id="image-preview" style="max-width: 100%; max-height: 300px; border-radius: 10px; border: 2px solid rgba(139, 0, 0, 0.5); box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);">
+                    <button type="button" onclick="clearImagePreview()" style="display: block; margin-top: 10px; padding: 8px 20px; font-size: 0.9em;">❌ Remove Image</button>
+                </div>
 
                 <button type="submit" id="submit-btn">✨ Add Item ✨</button>
                 <button type="button" id="cancel-btn" class="cancel-btn" onclick="cancelEdit()" style="display: none;">❌ Cancel</button>
@@ -515,9 +520,23 @@
     </div>
 
     <script>
-        const BASE_URL = "http://localhost:8080/menu";
+        // ==================== OLD MANAGER JAVASCRIPT CODE ====================
+
         let requesterId = null;
         let editingItemId = null;
+
+        function getUserBaseUrl() {
+            return getBaseURL() + '/menu';
+        }
+        function getBaseURL() {
+        // Check if Android injected the URL
+            if (window.BACKEND_URL) {
+                return window.BACKEND_URL;
+            }
+            
+            // Fallback for browser testing
+            return 'http://localhost:8080';
+        }
 
         // Check authentication and role
         function checkAuth() {
@@ -564,8 +583,8 @@
 
         async function loadMenu() {
             try {
-                console.log("Loading menu from:", BASE_URL);
-                const res = await fetch(BASE_URL);
+                console.log("Loading menu from:", getUserBaseUrl());
+                const res = await fetch(getUserBaseUrl());
                 
                 if (!res.ok) {
                     throw new Error(`HTTP error! status: ${res.status}`);
@@ -588,7 +607,7 @@
                     div.style.animationDelay = `${index * 0.1}s`;
                     div.innerHTML = `
                         <h3>${item.name} - $${item.price}</h3>
-                        <p><strong>Category:</strong> ${getCategoryEmoji(item.category)} ${item.category.replace('_', ' ')}</p>
+                        <p><strong>Category:</strong> ${getCategoryEmoji(item.category)}</p>
                         <p><strong>Stock:</strong> ${item.stockQuantity} available</p>
                         <p>${item.description || 'No description'}</p>
                         ${item.imagePath ? `<img src="http://localhost:8080/uploads/${item.imagePath}" alt="${item.name}">` : ""}
@@ -618,7 +637,7 @@
         }
 
         function editItem(itemId) {
-            fetch(`${BASE_URL}/${itemId}`)
+            fetch(`${getUserBaseUrl()}/${itemId}`)
                 .then(res => res.json())
                 .then(item => {
                     document.getElementById("name").value = item.name;
@@ -664,7 +683,7 @@
             
             try {
                 console.log("Deleting item ID:", cleanItemId);
-                const res = await fetch(`${BASE_URL}/delete/${requesterId}/${cleanItemId}`, { 
+                const res = await fetch(`${getUserBaseUrl()}/delete/${requesterId}/${cleanItemId}`, { 
                     method: "DELETE" 
                 });
                 
@@ -744,7 +763,7 @@
                         formData.append("file", file);
                         formData.append("menuItem", JSON.stringify(menuItemData));
 
-                        const res = await fetch(`${BASE_URL}/update/with-image/${requesterId}/${cleanEditingItemId}`, {
+                        const res = await fetch(`${getUserBaseUrl()}/update/with-image/${requesterId}/${cleanEditingItemId}`, {
                             method: "PUT",
                             body: formData
                         });
@@ -757,7 +776,7 @@
                         console.log("Item updated with new image");
                     } else {
                         // Update without changing image
-                        const res = await fetch(`${BASE_URL}/update/${requesterId}/${cleanEditingItemId}`, {
+                        const res = await fetch(`${getUserBaseUrl()}/update/${requesterId}/${cleanEditingItemId}`, {
                             method: "PUT",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify(menuItemData)
@@ -779,7 +798,7 @@
                         formData.append("file", file);
                         formData.append("menuItem", JSON.stringify(menuItemData));
 
-                        const res = await fetch(`${BASE_URL}/create/with-image/${requesterId}`, {
+                        const res = await fetch(`${getUserBaseUrl()}/create/with-image/${requesterId}`, {
                             method: "POST",
                             body: formData
                         });
@@ -791,7 +810,7 @@
                         
                         console.log("Item added with image");
                     } else {
-                        const res = await fetch(`${BASE_URL}/create/${requesterId}`, {
+                        const res = await fetch(`${getUserBaseUrl()}/create/${requesterId}`, {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify(menuItemData)

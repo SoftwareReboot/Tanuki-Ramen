@@ -588,7 +588,20 @@
     </div>
 
     <script>
-        const BASE_URL = "http://localhost:8080/users";
+
+        function getUserBaseURL() {
+            return getBaseURL() + '/users';
+        }
+
+        function getBaseURL() {
+        // Check if Android injected the URL
+            if (window.BACKEND_URL) {
+                return window.BACKEND_URL;
+            }
+            
+            // Fallback for browser testing
+            return 'http://localhost:8080';
+        }
 
         function switchTab(tab) {
             // Update tab styling
@@ -622,10 +635,10 @@
             button.innerHTML = '<span class="spinner"></span>Signing in...';
 
             try {
-                console.log('Attempting to fetch user:', `${BASE_URL}/username/${username}`);
+                console.log('Attempting to fetch user:', `${getUserBaseURL()}/username/${username}`);
                 
                 // Get user by username
-                const response = await fetch(`${BASE_URL}/username/${username}`, {
+                const response = await fetch(`${getUserBaseURL()}/username/${username}`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json'
@@ -659,7 +672,7 @@
                 setTimeout(() => {
                     // Redirect based on role
                     if (userRole === 'MANAGER') {
-                        window.location.href = 'index.html';
+                        window.location.href = 'manager.html';
                     } else if (userRole === 'CASHIER') {
                         window.location.href = 'payment.html';
                     } else if (userRole === 'WAITER') {
@@ -676,7 +689,7 @@
                 
                 // Better error messages
                 if (error.message === 'Failed to fetch') {
-                    showNotification('❌ Cannot connect to server. Make sure backend is running on http://localhost:8080', 'error');
+                    showNotification('❌ Cannot connect to server. Make sure backend is running on ' + getUserBaseURL(), 'error');
                 } else {
                     showNotification('❌ ' + error.message, 'error');
                 }
@@ -700,7 +713,7 @@
             try {
                 console.log('Registering user with role:', role);
                 
-                const response = await fetch(BASE_URL, {
+                const response = await fetch(getUserBaseURL(), {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -735,7 +748,7 @@
                 console.error('Error details:', error.message);
                 
                 if (error.message === 'Failed to fetch') {
-                    showNotification('❌ Cannot connect to server. Make sure backend is running on http://localhost:8080', 'error');
+                    showNotification('❌ Cannot connect to server. Make sure backend is running on ' + getUserBaseURL(), 'error');
                 } else {
                     showNotification('❌ ' + error.message, 'error');
                 }

@@ -53,13 +53,13 @@ public class OrderController {
         }
     }
 
-    @PutMapping("/{orderId}/coopking")
+    @PutMapping("/{orderId}/cooking")
     public ResponseEntity<?> markOrderAsPreparing(
             @PathVariable Long orderId,
             @RequestBody Map<String, Long> request) {
         try {
-            Long chefId = request.get("chefId");
-            Order order = orderService.markOrderAsCooking(orderId, chefId);
+            Long cashierId = request.get("cashierId");
+            Order order = orderService.markOrderAsCooking(orderId, cashierId);
             return ResponseEntity.ok(order);
         } catch (SecurityException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", e.getMessage()));
