@@ -1090,7 +1090,13 @@
                 
                 // Reset form
                 clearMenuForm();
-                await loadMenuItems();
+                
+                try {
+                    await loadMenuItems();
+                } catch (e) {
+                    console.warn('Menu added but refresh failed', e);
+                }
+
                 showNotification(editingMenuItem ? 'Menu item updated successfully' : 'Menu item added successfully', 'success');
             } catch (error) {
                 console.error('Error submitting menu form:', error);

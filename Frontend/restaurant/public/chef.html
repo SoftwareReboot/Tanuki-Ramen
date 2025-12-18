@@ -375,21 +375,11 @@
     </div>
 
     <script>
-        function getUserBaseURL() {
-            return getBaseURL() + '/api/orders';
-        }
-
-        function getBaseURL() {
-        // Check if Android injected the URL
-            if (window.BACKEND_URL) {
-                return window.BACKEND_URL;
-            }
-            
-            // Fallback for browser testing
-            return 'http://localhost:8080';
-        }
-        
+        // Configuration
+        let API_BASE_URL = null;
         let chefId = null;
+
+        // Drag state management
         let dragState = {
             isDragging: false,
             startY: 0,
@@ -397,10 +387,67 @@
             orderId: null
         };
 
+        // Get backend URL based on environment
+        function getBaseURL() {
+            // Check if Android injected the URL
+            if (window.BACKEND_URL) {
+                return window.BACKEND_URL;
+            }
+            
+            // Fallback for browser testing
+            return 'http://localhost:8080';
+        }
+
+        function getUserBaseURL() {
+            return API_BASE_URL + '/api/orders';
+        }
+
+        // Check authentication and role
+        function checkAuth() {
+            const currentUser = localStorage.getItem('currentUser');
+            
+            if (!currentUser) {
+                // Not logged in - redirect to login
+                window.location.href = 'LoginPage.html';
+                return false;
+            }
+
+            try {
+                const user = JSON.parse(currentUser);
+                
+                // Update user info display
+                const userNameEl = document.getElementById('user-name');
+                const userRoleEl = document.getElementById('user-role');
+                if (userNameEl) userNameEl.textContent = user.name || user.username;
+                if (userRoleEl) userRoleEl.textContent = user.role;
+                
+                // Check if user is a chef (if role validation is needed)
+                // Uncomment the following lines if you want to restrict access to CHEF role only
+                /*
+                if (user.role !== 'CHEF') {
+                    alert('Access denied. Chef role required.');
+                    window.location.href = 'LoginPage.html';
+                    return false;
+                }
+                */
+
+                chefId = user.userId;
+                return true;
+            } catch (e) {
+                console.error('Error parsing user data:', e);
+                window.location.href = 'LoginPage.html';
+                return false;
+            }
+        }
+
         function handleLogout() {
             if (confirm('Are you sure you want to logout?')) {
+                // Clear user data
                 localStorage.removeItem('currentUser');
+                
                 showNotification('👋 Logged out successfully!');
+                
+                // Redirect to login page
                 setTimeout(() => {
                     window.location.href = 'LoginPage.html';
                 }, 1000);
@@ -610,27 +657,6 @@
             }
         }
 
-        function checkAuth() {
-            const currentUser = localStorage.getItem('currentUser');
-            
-            if (!currentUser) {
-                window.location.href = 'LoginPage.html';
-                return false;
-            }
-
-            try {
-                const user = JSON.parse(currentUser);
-                document.getElementById('user-name').textContent = user.name || user.username;
-                document.getElementById('user-role').textContent = user.role;
-                
-                return true;
-            } catch (e) {
-                console.error('Error parsing user data:', e);
-                window.location.href = 'LoginPage.html';
-                return false;
-            }
-        }
-
         // Auto-refresh every 30 seconds
         setInterval(() => {
             loadPreparingOrders();
@@ -638,10 +664,19 @@
 
         // Initialize on page load
         window.onload = function() {
-            if (checkAuth()) {
-                console.log("🚀 Initializing Preparing Orders Manager...");
-                loadPreparingOrders();
+            // Set API base URL
+            API_BASE_URL = getBaseURL();
+            
+            // Check authentication first
+            if (!checkAuth()) {
+                return;
             }
+            
+            console.log("🚀 Initializing Preparing Orders Manager...");
+            console.log("Chef ID:", chefId);
+            console.log("API Base URL:", API_BASE_URL);
+            
+            loadPreparingOrders();
         };
     </script>
 </body>
